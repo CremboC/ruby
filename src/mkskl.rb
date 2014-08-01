@@ -1,9 +1,8 @@
 require 'fileutils'
 
-puts "Ruby Project Skeletonizer by Crembo",
+puts "\nRuby Project Skeletonizer by Crembo",
      "Creates a simple Ruby project skeleton",
-     "More details at https://github.com/CremboC/skeletonizer",
-     ""
+     "More details at https://github.com/CremboC/skeletonizer \n\n"
 
 # arguments not there? exit.
 if ARGV[0].nil? || ARGV[1].nil?
@@ -19,8 +18,7 @@ $project_name = ARGV[0].dup
 $path = ARGV[1].dup
 $details = false
 
-
-if ARGV[2].nil? && ARGV[2] == "-d"
+if !ARGV[2].nil? && ARGV[2] == "-d"
   $details = true
 end
 

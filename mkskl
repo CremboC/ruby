@@ -1,4 +1,4 @@
 set -x
 set -e
 
-ruby src/mkskl.rb $1 $2
+ruby src/mkskl.rb $1 $2 $3 $4 $5
