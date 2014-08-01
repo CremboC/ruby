@@ -22,22 +22,53 @@ if $path[-1, 1] == '/'
   $path.chomp '/'
 end
 
+# makes sure project_name has no spaces
+if $project_name.include? " "
+  puts "Project name contains spaces. This may result in unexpected behaviour."
+  puts "It is recommended to not use spaces. Are you sure this is what you want?"
+  puts "[C] to continue with spaces"
+  puts "[R] to remove spaces from project_name"
+  puts "[U] to replace spaces with underscores i.e. _"
+  print "[X] to exit ... "
+  
+  inp = $stdin.gets.chomp
+  
+  case inp
+    when "C"
+      puts "Continuing execution..."
+    when "R"
+      puts "Deleting spaces"
+      $project_name.delete ' '
+    when "U"
+      puts "Replacing spaces with underscores"
+      $project_name.gsub! ' ', '_'
+    when "X"
+      puts "Exiting..."
+      exit 0
+    else 
+      puts "Exiting..."
+      exit 0
+  end
+end
+
 # makes sure user didn't input project name by mistake
 if $path.include? $project_name
   puts "Project name detected in path. This generator adds the project name to"
   puts "the end of the path automatically, are you sure this is what you want?"
-  puts "Type [Y] to continue, [N] to remove the project name from the path"
-  print "Or [X] to exit ... "
+  puts "Type one of the follow and press enter: "
+  puts "[C] to continue without modifying the path" 
+  puts "[R] to remove the project name from the path"
+  print "[X] to exit ... "
 
   inp = $stdin.gets.chomp
 
   case inp
-    when "Y"
-      puts "Continuing execution.."
-    when "N"
+    when "C"
+      puts "Continuing execution..."
+    when "R"
       $path.slice! $project_name
     when "X"
-      puts "Exiting.."
+      puts "Exiting..."
       exit 0
     else # in any other case exit
       puts "Exiting..."
@@ -62,12 +93,15 @@ else
   exit 0
 end
 
-default_folders = ["ext", "tests", "bin", "doc", "lib", "tests"]
+default_folders = ["ext", "tests", "bin", "doc", "lib", "tests", "data"]
 
 # create all default folders
 default_folders.each do |folder| 
   FileUtils::mkdir_p "#{$project_path}/#{folder}" 
 end
+
+# create project folder in lib
+FileUtils::mkdir_p "#{$project_path}/lib/#{$project_name}"
 
 ##
 ## GEMSPEC FILE TEMPLATE
@@ -125,3 +159,51 @@ File.open("#{$project_path}/Rakefile", "w+") {
   puts "Done"
 }
 
+# create file in bin
+print "Creating stub in bin/..."
+File.open("#{$project_path}/bin/#{$project_name}", "w+") {
+  |f|
+  f.write("")
+  puts "Done"
+}
+
+# create files in lib
+print "Creating <project_name> and <project_name.rb> in lib/..."
+
+File.open("#{$project_path}/lib/#{$project_name}}", "w+") {
+  |f|
+  f.write("")
+}
+
+File.open("#{$project_path}/lib/#{$project_name}.rb", "w+") {
+  |f|
+  f.write("")
+}
+
+puts "Done"
+
+camelized_project_name = $project_name.camelize
+
+##
+## TEST CASE TEMPLATE
+##
+test_templ = <<END
+require "lib/#{$project_name}.rb"
+require "test/unit"
+
+class Test#{$camelized_project_name} < Test::Unit::TestCase
+
+  def test_sample
+      assert_equal(4, 2+2)
+  end
+        
+end
+END
+
+# creating test case sample..
+print "Creating sample unit test..."
+File.open("#{$project_path}/tests/test_#{$project_name}.rb", "w+") {
+  |f|
+  f.write(test_templ)
+  puts "Done"
+}
