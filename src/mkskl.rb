@@ -116,27 +116,14 @@ FileUtils::mkdir_p "#{$project_path}/lib/#{$project_name}"
 
 # accept more personal details
 
-puts "",
-     "Do you want to to input more details into your Gemspec file?",
-     "[Y] to enter details"
-print "[N] to continue with empty template ... "
-
-inp = $stdin.gets.chomp
-
-details = { :full_name => "name", :email => "email", :site => "website" }
-
-case inp
-  when "Y"
-    details.each do |key, detail|
-      puts ""
-      print "Please enter your #{detail}: "
-      value = $stdin.gets.chomp
-      instance_variable_set "@#{key}", value
-    end
-  when "N"
-    puts "Continuing as default.."
-  else
-    puts "Continuing as default.."
+if $details
+  puts "Details flag is set.. Please enter your details: "
+  details = { :full_name => "name", :email => "email", :site => "website" }
+  details.each do |key, detail|
+    print "\n Please enter your #{detail}: "
+    value = $stdin.gets.chomp
+    instance_variable_set "@#{key}", value
+  end
 end
 
 ##
