@@ -76,8 +76,6 @@ if $path.include? $project_name
    end
 end
 
-puts $path
-
 # concat path with project name
 $project_path = "#{$path}/#{$project_name}"
 
@@ -106,7 +104,7 @@ FileUtils::mkdir_p "#{$project_path}/lib/#{$project_name}"
 ##
 ## GEMSPEC FILE TEMPLATE
 ##
-gemspec_templ = <<END
+gemspec_templ = <<TEMPL
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
@@ -126,7 +124,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = ["tests/#{$project_name}_tests.rb"]
   spec.require_paths = ["lib"]
 end
-END
+TEMPL
 
 # create gemspec file
 print "Creating gemspec file..."
@@ -140,7 +138,7 @@ File.open("#{$project_path}/#{$project_name}.gemspec", "w+") {
 ##
 ## RAKEFILE TEMPLATE
 ##
-rakefile_templ = <<END
+rakefile_templ = <<TEMPL
 require 'rake/testtask'
 
 Rake::TestTask.new do |t|
@@ -148,7 +146,7 @@ Rake::TestTask.new do |t|
   t.test_files = FileList['tests/test*.rb']
   t.verbose = true
 end
-END
+TEMPL
 
 # create Rakefile
 print "Creating Rakefile..."
@@ -167,13 +165,8 @@ File.open("#{$project_path}/bin/#{$project_name}", "w+") {
   puts "Done"
 }
 
-# create files in lib
-print "Creating <project_name> and <project_name.rb> in lib/..."
-
-File.open("#{$project_path}/lib/#{$project_name}}", "w+") {
-  |f|
-  f.write("")
-}
+# create rb in lib
+print "Creating <project_name.rb> in lib/..."
 
 File.open("#{$project_path}/lib/#{$project_name}.rb", "w+") {
   |f|
@@ -181,27 +174,34 @@ File.open("#{$project_path}/lib/#{$project_name}.rb", "w+") {
 }
 
 puts "Done"
+class String
+  def camel_case
+    return self if self !~ /_/ && self =~ /[A-Z]+.*/
+    split('_').map{|e| e.capitalize}.join
+  end
+end
 
-camelized_project_name = $project_name.camelize
+camelized_project_name = $project_name.camel_case
 
 ##
 ## TEST CASE TEMPLATE
 ##
-test_templ = <<END
+test_templ = <<TMPL
 require "lib/#{$project_name}.rb"
 require "test/unit"
 
-class Test#{$camelized_project_name} < Test::Unit::TestCase
+class Test#{camelized_project_name} < Test::Unit::TestCase
 
   def test_sample
-      assert_equal(4, 2+2)
+      assert_equal(4, 2 + 2)
   end
         
 end
-END
+TMPL
 
 # creating test case sample..
 print "Creating sample unit test..."
+
 File.open("#{$project_path}/tests/test_#{$project_name}.rb", "w+") {
   |f|
   f.write(test_templ)
