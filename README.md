@@ -3,7 +3,7 @@ Ruby Project Skeletonizer
 
 Creates a simple Ruby project skeleton.
 
-Usage: ```ruby mkskl.rb [project_name] [absolute_path]```
+Usage: ```./mkskl [project_name] [absolute_path]```
 
 ```[absolute_path]``` shouldn't contain the the project name
 
