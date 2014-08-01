@@ -8,13 +8,21 @@ puts "Ruby Project Skeletonizer by Crembo",
 # arguments not there? exit.
 if ARGV[0].nil? || ARGV[1].nil?
   puts "Usage: mkskl.rb <project_name> <absolute_path>",
-       "Example: mkskl.rb blog /usr/share/ruby"
+       "Example: mkskl.rb blog /usr/share/ruby",
+       "Additional flags: \n",
+       "-d - to be prompted to enter details which will go into the gemspec"
   exit 0
 end
 
 # duplicate so they are mutable
 $project_name = ARGV[0].dup
 $path = ARGV[1].dup
+$details = false
+
+
+if ARGV[2].nil? && ARGV[2] == "-d"
+  $details = true
+end
 
 # FIXME: pls, shouldn't be like this
 if $path[0, 1] == '~'
@@ -106,6 +114,31 @@ end
 # create project folder in lib
 FileUtils::mkdir_p "#{$project_path}/lib/#{$project_name}"
 
+# accept more personal details
+
+puts "",
+     "Do you want to to input more details into your Gemspec file?",
+     "[Y] to enter details"
+print "[N] to continue with empty template ... "
+
+inp = $stdin.gets.chomp
+
+details = { :full_name => "name", :email => "email", :site => "website" }
+
+case inp
+  when "Y"
+    details.each do |key, detail|
+      puts ""
+      print "Please enter your #{detail}: "
+      value = $stdin.gets.chomp
+      instance_variable_set "@#{key}", value
+    end
+  when "N"
+    puts "Continuing as default.."
+  else
+    puts "Continuing as default.."
+end
+
 ##
 ## GEMSPEC FILE TEMPLATE
 ##
@@ -117,11 +150,11 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 Gem::Specification.new do |spec|
   spec.name          = $project_name
   spec.version       = '1.0'
-  spec.authors       = ["Your Name Here"]
-  spec.email         = ["youremail@yourdomain.com"]
+  spec.authors       = ["#{@full_name}"]
+  spec.email         = ["#{@email}"]
   spec.summary       = %q{Short summary of your project}
   spec.description   = %q{Longer description of your project.}
-  spec.homepage      = "http://domainforproject.com/"
+  spec.homepage      = "#{@site}"
   spec.license       = "MIT"
 
   spec.files         = ["lib/#{$project_name}.rb"]
