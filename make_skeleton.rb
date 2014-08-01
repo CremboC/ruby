@@ -1,14 +1,15 @@
 require 'fileutils'
 
-$project_name = ARGV[0].dup
-$path = ARGV[1].dup
-
-# arguments not there? exit
-if ($project_name.nil? || $path.nil?)
-  puts "Usage: mkskl.rb <project_name> <path>"
+# arguments not there? exit.
+if ARGV[0].nil? || ARGV[1].nil?
+  puts "Usage: mkskl.rb <project_name> <pat>"
   puts "Example: mkskl.rb blog /usr/share/ruby"
   exit 0
 end
+
+# duplicate so they are mutable
+$project_name = ARGV[0].dup
+$path = ARGV[1].dup
 
 # FIXME: pls, shouldn't be like this
 if $path[0, 1] == '~'
@@ -68,8 +69,59 @@ default_folders.each do |folder|
   FileUtils::mkdir_p "#{$project_path}/#{folder}" 
 end
 
+##
+## GEMSPEC FILE TEMPLATE
+##
+gemspec_templ = <<END
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+Gem::Specification.new do |spec|
+  spec.name          = $project_name
+  spec.version       = '1.0'
+  spec.authors       = ["Your Name Here"]
+  spec.email         = ["youremail@yourdomain.com"]
+  spec.summary       = %q{Short summary of your project}
+  spec.description   = %q{Longer description of your project.}
+  spec.homepage      = "http://domainforproject.com/"
+  spec.license       = "MIT"
 
+  spec.files         = ["lib/#{$project_name}.rb"]
+  spec.executables   = ["bin/#{$project_name}"]
+  spec.test_files    = ["tests/#{$project_name}_tests.rb"]
+  spec.require_paths = ["lib"]
+end
+END
 
+# create gemspec file
+print "Creating gemspec file..."
 
+File.open("#{$project_path}/#{$project_name}.gemspec", "w+") {
+  |f|
+  f.write(gemspec_templ)
+  puts "Done"
+}
+
+##
+## RAKEFILE TEMPLATE
+##
+rakefile_templ = <<END
+require 'rake/testtask'
+
+Rake::TestTask.new do |t|
+  t.libs << "tests"
+  t.test_files = FileList['tests/test*.rb']
+  t.verbose = true
+end
+END
+
+# create Rakefile
+print "Creating Rakefile..."
+
+File.open("#{$project_path}/Rakefile", "w+") {
+  |f|
+  f.write(rakefile_templ)
+  puts "Done"
+}
 
