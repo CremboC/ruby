@@ -170,7 +170,7 @@ print "Creating <project_name.rb> in lib/..."
 
 File.open("#{$project_path}/lib/#{$project_name}.rb", "w+") {
   |f|
-  f.write("")
+  f.write("puts 'Hello World!'")
 }
 
 puts "Done"
@@ -187,7 +187,7 @@ camelized_project_name = $project_name.camel_case
 ## TEST CASE TEMPLATE
 ##
 test_templ = <<TMPL
-require "lib/#{$project_name}.rb"
+require_relative "../lib/#{$project_name}.rb"
 require "test/unit"
 
 class Test#{camelized_project_name} < Test::Unit::TestCase
